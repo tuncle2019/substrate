@@ -1,0 +1,52 @@
+use structopt::StructOpt;
+use std::fmt::{self, Display, Formatter};
+
+// 定义一个App
+#[derive(StructOpt)]
+#[structopt(name="app",about="Terry's First structopt App")]
+pub struct Appargs {
+    #[structopt(subcommand)]
+    pub command:Command,
+}
+
+// 定义子命令
+#[derive(StructOpt)]
+pub enum Command {
+    //add operation
+    #[structopt(name="add")]
+    Add(Elements),
+
+    //times operation
+    #[structopt(name="times")]
+    Times(Elements),
+}
+
+#[derive(StructOpt)]
+pub struct Elements {
+    pub elements: Vec<u32>,
+}
+
+// 实现Display trait
+impl Display for Elements {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result{
+        write!(f,"[{:#?}]",self.elements)
+    }
+}
+
+fn main() {
+    //使用StructOpt来解析命令行参数，并赋值给AppArgs类型的变量opt
+  let opt = Appargs::from_args();
+
+    match opt.command {
+        Command::Add(e) => {
+            let result = e.elements.iter().fold(0,|acc,&x| acc + x);
+            println!("params:{},results:{}",e,result)
+        },
+
+        Command::Times(e) => {
+            let result = e.elements.iter().fold(1,|acc,&x| acc * x);
+            println!("params:{},results:{}",e,result)
+        },
+    }
+
+}
